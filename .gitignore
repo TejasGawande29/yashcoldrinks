@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Zip files
+thumsup750.zip
+
+# IDE
+.vscode/
+
+# Build outputs
+dist/
