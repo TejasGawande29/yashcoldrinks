@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
+if (!isset($_SESSION["USERNAME"]) || !in_array($_SESSION["ROLE"], ["admin", "manager"])) {
     header("Location: adminlogin.php");
     exit();
 }
@@ -14,7 +14,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
     <!-- tailwindcss -->
     <link rel="stylesheet" href="output.css">
     <!-- jquery -->
-    <script src="../js/jquery.js"></script>
+    <script src="/YashColdrinks/assets/js/jquery.js"></script>
     <!-- Tables -->
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.css">
@@ -45,38 +45,59 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
     </style>
 </head>
 
-<body class="bg-gradient-to-tr from-violet-100 to-cyan-100 min-h-screen font-sans text-gray-800">
-    <section class="max-w-screen-xl mx-auto px-4 py-8">
-        <div class="grid lg:grid-cols-[18%_auto] gap-8">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen font-sans text-gray-800">
+    <section class="max-w-screen-2xl mx-auto p-4 lg:p-6">
+        <div class="flex flex-col lg:flex-row gap-6">
             <!-- Sidebar -->
             <?php include_once("layouts/sidebar.php") ?>
 
             <!-- Main Content -->
-            <div class="backdrop-blur-md bg-white/60 p-8 rounded-3xl shadow-xl transition hover:shadow-2xl duration-300 border border-white/50">
-                <h1 class="text-5xl font-extrabold text-violet-600 text-center mb-10 animate-fade-in-down tracking-tight">
-                    💸 Expense Management
-                </h1>
+            <div class="flex-1 min-w-0 bg-white p-6 lg:p-8 rounded-2xl shadow-xl">
+                <!-- Header -->
+                <div class="mb-8">
+                  <h1 class="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+                    <span class="w-10 h-10 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
+                      <i data-lucide="wallet" class="w-5 h-5"></i>
+                    </span>
+                    Expense Management
+                  </h1>
+                  <p class="text-gray-500 mt-1 ml-13">Track and manage all business expenses.</p>
+                </div>
+                
+                <script>lucide.createIcons();</script>
 
                 <!-- Expense Form -->
-                <div class="bg-white/80 rounded-2xl shadow-lg p-6 mb-10 border border-gray-200 animate-fade-in-down">
-                    <h2 class="text-2xl font-bold text-teal-700 mb-4">➕ Add New Expense</h2>
+                <div class="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border border-rose-100 p-6 mb-8">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-rose-500"></i>
+                        Add New Expense
+                    </h2>
                     <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-gray-700 mb-2">Date</label>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-4 h-4 text-rose-500"></i>
+                                Date
+                            </label>
                             <input type="date" id="expenseDate"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-inner bg-white focus:ring-4 focus:ring-teal-400 focus:outline-none"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:border-rose-500 focus:outline-none transition-all"
                                 value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Expense Type</label>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                <i data-lucide="tag" class="w-4 h-4 text-rose-500"></i>
+                                Expense Type
+                            </label>
                             <input type="text" id="expenseType"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-inner bg-white focus:ring-4 focus:ring-teal-400 focus:outline-none"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:border-rose-500 focus:outline-none transition-all"
                                 placeholder="e.g. Supplies, Utilities" required>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Amount (₹)</label>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                <i data-lucide="indian-rupee" class="w-4 h-4 text-rose-500"></i>
+                                Amount
+                            </label>
                             <input type="number" id="amount" step="0.01" min="0"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-inner bg-white focus:ring-4 focus:ring-teal-400 focus:outline-none"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:border-rose-500 focus:outline-none transition-all"
                                 placeholder="0.00" required>
                         </div>
                         <div>
@@ -190,6 +211,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
         });
 
         function filterExpenses(timeframe) {
+            currentFilter = timeframe;
             $.ajax({
                 url: "functions.php",
                 type: "POST",
@@ -239,8 +261,8 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
                     if (result.success) {
                         toastr.success('Expense added successfully!');
                         $('#expenseForm')[0].reset();
-                        $('#expenseDate').val();
-                        filterExpenses('today');
+                        $('#expenseDate').val(new Date().toISOString().split('T')[0]);
+                        filterExpenses(currentFilter);
                     } else {
                         toastr.error(result.message || 'Failed to add expense');
                     }
@@ -250,6 +272,8 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
                 }
             });
         }
+
+        var currentFilter = 'today';
 
         function deleteExpense(id) {
             if (!confirm('Are you sure you want to delete this expense?')) return;
@@ -265,7 +289,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] != "admin") {
                     const result = JSON.parse(response);
                     if (result.success) {
                         toastr.success('Expense deleted successfully!');
-                        filterExpenses($('.filter-active').data('timeframe') || 'today');
+                        filterExpenses(currentFilter);
                     } else {
                         toastr.error(result.message || 'Failed to delete expense');
                     }

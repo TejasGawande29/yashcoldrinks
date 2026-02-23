@@ -1,8 +1,10 @@
 <?php
 session_start();
-if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["ROLE"] == "admin") {
+if (isset($_SESSION["USERNAME"]) && isset($_SESSION["ROLE"]) && $_SESSION["ROLE"] == "admin") {
+    // User is authenticated
 } else {
     header("Location: adminlogin.php");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -14,7 +16,7 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
     <!-- taliwindcss -->
     <link rel="stylesheet" href="output.css">
     <!-- jquery -->
-    <script src="../js/jquery.js"></script>
+    <script src="/YashColdrinks/assets/js/jquery.js"></script>
     <!-- Tables -->
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.css">
@@ -30,67 +32,91 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
     <title>Dashboard</title>
 </head>
 
-<body class="bg-gradient-to-tr from-violet-100 to-cyan-100 min-h-screen font-sans text-gray-800">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen font-sans text-gray-800">
 
-    <section class="max-w-screen-xl mx-auto px-4 py-8">
-        <div class="grid lg:grid-cols-[18%_auto] gap-8">
+    <section class="max-w-screen-2xl mx-auto p-4 lg:p-6">
+        <div class="flex flex-col lg:flex-row gap-6">
 
             <!-- Sidebar -->
             <?php include_once("layouts/sidebar.php") ?>
 
             <!-- Main Content -->
-            <div class="backdrop-blur-md bg-white/60 p-8 rounded-3xl shadow-xl transition hover:shadow-2xl duration-300 border border-white/50">
-                <h1 class="text-5xl font-extrabold text-violet-600 text-center mb-10 animate-fade-in-down tracking-tight">
-                    🚀 Update Dashboard
-                </h1>
+            <div class="flex-1 min-w-0 bg-white p-6 lg:p-8 rounded-2xl shadow-xl">
+                <!-- Header -->
+                <div class="mb-8">
+                  <h1 class="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+                    <span class="w-10 h-10 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
+                      <i data-lucide="settings" class="w-5 h-5"></i>
+                    </span>
+                    Update Dashboard
+                  </h1>
+                  <p class="text-gray-500 mt-1 ml-13">Manage products, agencies, and counters.</p>
+                </div>
+                
+                <script>lucide.createIcons();</script>
 
                 <!-- Input Sections -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 
                     <!-- Product Input -->
-                    <div class="flex flex-col items-center gap-5 animate-fade-in-left">
+                    <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-6">
+                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <i data-lucide="package" class="w-5 h-5 text-violet-500"></i>
+                            Add Product
+                        </h3>
                         <input
                             type="text"
                             id="productName"
                             placeholder="Enter Product Name"
-                            class="w-full max-w-md px-5 py-3 border border-gray-300 rounded-2xl shadow-inner text-lg bg-white/90 focus:ring-4 focus:ring-violet-400 focus:outline-none transition-transform duration-300 hover:scale-105 placeholder-gray-500">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:border-violet-500 focus:outline-none transition-all mb-4">
                         <button
                             onclick="addProductName();"
-                            class="bg-gradient-to-r from-teal-400 to-violet-500 text-white font-semibold px-6 py-2 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                            + Add Product
+                            class="w-full bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Add Product
                         </button>
                     </div>
 
                     <!-- Agency Input -->
-                    <div class="flex flex-col items-center gap-5 animate-fade-in-right">
+                    <div class="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl border border-teal-100 p-6">
+                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <i data-lucide="building-2" class="w-5 h-5 text-teal-500"></i>
+                            Add Agency
+                        </h3>
                         <input
                             type="text"
                             id="agencyName"
                             placeholder="Enter Agency Name"
-                            class="w-full max-w-md px-5 py-3 border border-gray-300 rounded-2xl shadow-inner text-lg bg-white/90 focus:ring-4 focus:ring-teal-400 focus:outline-none transition-transform duration-300 hover:scale-105 placeholder-gray-500">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:border-teal-500 focus:outline-none transition-all mb-4">
                         <button
                             onclick="addAgencyName();"
-                            class="bg-gradient-to-r from-violet-400 to-teal-500 text-white font-semibold px-6 py-2 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                            + Add Agency
+                            class="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-teal-500/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Add Agency
                         </button>
                     </div>
                     <!-- Conter Input -->
-                    <div class="flex flex-col items-center gap-5 animate-fade-in-right">
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-100 p-6">
+                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <i data-lucide="store" class="w-5 h-5 text-amber-500"></i>
+                            Add Counter
+                        </h3>
                         <input
                             type="text"
                             id="countername"
                             placeholder="Enter Counter Name"
-                            class="w-full max-w-md px-5 py-3 border border-gray-300 rounded-2xl shadow-inner text-lg bg-white/90 focus:ring-4 focus:ring-teal-400 focus:outline-none transition-transform duration-300 hover:scale-105 placeholder-gray-500">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:border-amber-500 focus:outline-none transition-all mb-4">
                         <button
                             onclick="addCounterName();"
-                            class="bg-gradient-to-r from-violet-400 to-teal-500 text-white font-semibold px-6 py-2 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                            + Add Counter
+                            class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Add Counter
                         </button>
                     </div>
                 </div>
 
                 <!-- Tables -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-14 animate-fade-in-up">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
 
                     <!-- Product Table -->
 <div class="rounded-2xl overflow-hidden shadow-xl bg-white/80 backdrop-blur p-6 border border-gray-200 hover:shadow-2xl transition h-full flex flex-col min-h-[300px]">

@@ -1,7 +1,8 @@
 <?php
 session_start();
-if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
+if (!isset($_SESSION["USERNAME"]) || !in_array($_SESSION["ROLE"], ["admin", "manager"])) {
   header("Location: adminlogin.php");
+  exit;
 }
 ?>
 <!DOCTYPE html>
@@ -16,7 +17,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
   <link rel="stylesheet" href="output.css" />
 
   <!-- jQuery -->
-  <script src="../js/jquery.js"></script>
+  <script src="/YashColdrinks/assets/js/jquery.js"></script>
 
   <!-- DataTables -->
   <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
@@ -36,24 +37,208 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-white text-gray-900 font-sans transition-all duration-300 ease-in-out">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 text-gray-900 font-sans transition-all duration-300 ease-in-out">
 
-  <section class="max-w-full lg:max-w-[1500px] mx-auto min-h-screen p-4">
-    <div class="grid lg:grid-cols-[20%_auto] gap-4">
+  <section class="max-w-screen-2xl mx-auto min-h-screen p-4 lg:p-6">
+    <div class="flex flex-col lg:flex-row gap-6">
 
       <!-- Sidebar: keep your sidebar exactly as is -->
       <?php include 'layouts/sidebar.php'; ?>
 
       <!-- Main content -->
-      <div class="rounded-lg shadow-lg bg-sky-50 p-6 animate-fade-in">
-        <h1 class="text-3xl font-bold text-blue-700 mb-6 text-center">📦 Total Stock Overview</h1>
-        <div class="overflow-x-auto rounded-lg border border-blue-100">
-          <table id="stock" class="display w-full text-sm"></table>
+      <div class="flex-1 min-w-0 bg-white rounded-2xl shadow-xl p-6 lg:p-8">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+            <span class="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+              <i data-lucide="package-search" class="w-5 h-5"></i>
+            </span>
+            Stock Overview
+          </h1>
+          <p class="text-gray-500 mt-1 ml-13">View and manage all stock entries.</p>
+        </div>
+        
+        <!-- Stock Table Card -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+          <div class="bg-gradient-to-r from-violet-500 to-purple-500 p-4">
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+              <i data-lucide="database" class="w-5 h-5"></i>
+              Total Stock Records
+            </h2>
+          </div>
+          <div class="p-4 overflow-x-auto">
+            <table id="stock" class="display w-full text-sm"></table>
+          </div>
+        </div>
+
+        <!-- Stock History Section -->
+        <div class="mt-8 bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+          <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4">
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              Stock History / Timeline
+            </h2>
+          </div>
+          <div class="p-4">
+            <!-- Filter Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                <select id="historyProduct" class="border rounded-md px-4 py-2 w-full">
+                  <option value="">All Products</option>
+                  <!-- Options loaded dynamically -->
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                <input type="date" id="historyFromDate" class="border rounded-md px-4 py-2 w-full" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                <input type="date" id="historyToDate" class="border rounded-md px-4 py-2 w-full" />
+              </div>
+              <div class="flex items-end">
+                <button onclick="loadStockHistory()" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-md hover:scale-105 transition w-full">
+                  <i data-lucide="filter" class="w-4 h-4 inline mr-1"></i> Filter
+                </button>
+              </div>
+            </div>
+
+            <!-- Timeline View -->
+            <div id="historyTimeline" class="space-y-4 max-h-96 overflow-y-auto">
+              <p class="text-gray-500 text-center py-8">Click "Filter" to load stock history</p>
+            </div>
+          </div>
         </div>
       </div>
 
     </div>
   </section>
+  
+  <script>
+    lucide.createIcons();
+
+    // Load products for history filter
+    function loadHistoryProducts() {
+      $.ajax({
+        url: "functions.php",
+        type: "POST",
+        data: { "RESULT_TYPE": "GET_PRODUCT_NAMES" },
+        success: function(res) {
+          try {
+            const jobj = JSON.parse(res);
+            if (jobj.success) {
+              const select = document.getElementById('historyProduct');
+              jobj.data.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.productname;
+                option.textContent = product.productname;
+                select.appendChild(option);
+              });
+            }
+          } catch (e) {
+            console.error("Error loading products:", e);
+          }
+        }
+      });
+    }
+
+    // Load stock history
+    function loadStockHistory() {
+      const product = document.getElementById('historyProduct').value;
+      const fromDate = document.getElementById('historyFromDate').value;
+      const toDate = document.getElementById('historyToDate').value;
+
+      $.ajax({
+        url: "functions.php",
+        type: "POST",
+        data: {
+          "RESULT_TYPE": "GET_STOCK_HISTORY",
+          "PRODUCTNAME": product,
+          "FROM_DATE": fromDate,
+          "TO_DATE": toDate
+        },
+        success: function(res) {
+          try {
+            const jobj = JSON.parse(res);
+            if (jobj.success) {
+              renderTimeline(jobj.data);
+            } else {
+              toastr.error(jobj.message || "Failed to load history.");
+            }
+          } catch (e) {
+            console.error("Parse error:", e);
+            toastr.error("Error parsing response.");
+          }
+        },
+        error: function() {
+          toastr.error("Failed to load stock history.");
+        }
+      });
+    }
+
+    // Render timeline
+    function renderTimeline(data) {
+      const container = document.getElementById('historyTimeline');
+      
+      if (data.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No stock history found for the selected criteria.</p>';
+        return;
+      }
+
+      let html = '<div class="relative pl-8 border-l-2 border-amber-300">';
+      
+      data.forEach((item, index) => {
+        const date = new Date(item.created_at || item.buydate);
+        const formattedDate = date.toLocaleDateString('en-IN', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const actionIcon = item.action_type === 'ADDED' ? 'plus-circle' : (item.action_type === 'SOLD' ? 'minus-circle' : 'edit');
+        const actionColor = item.action_type === 'ADDED' ? 'green' : (item.action_type === 'SOLD' ? 'red' : 'blue');
+
+        html += `
+          <div class="relative mb-6 ${index === 0 ? 'animate-fade-in' : ''}">
+            <div class="absolute -left-10 w-4 h-4 bg-${actionColor}-500 rounded-full border-2 border-white shadow"></div>
+            <div class="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-${actionColor}-100 text-${actionColor}-800">
+                    <i data-lucide="${actionIcon}" class="w-3 h-3 mr-1"></i>
+                    ${item.action_type || 'ADDED'}
+                  </span>
+                  <h4 class="font-semibold text-gray-800 mt-2">${item.productname}</h4>
+                  <p class="text-sm text-gray-600">
+                    Quantity: <span class="font-medium">${item.quantity}</span>
+                    ${item.batch_number ? ' | Batch: <span class="font-medium">' + item.batch_number + '</span>' : ''}
+                    ${item.expiry_date ? ' | Expiry: <span class="font-medium">' + item.expiry_date + '</span>' : ''}
+                  </p>
+                  <p class="text-sm text-gray-500">Agency: ${item.agencyname || '-'}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs text-gray-400">${formattedDate}</p>
+                  <p class="font-semibold text-gray-700 mt-1">₹${parseFloat(item.totalbillamount || 0).toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // Initialize on page load
+    $(document).ready(function() {
+      loadHistoryProducts();
+    });
+  </script>
 
   <!-- Payment Modal -->
   <!-- Replace your existing payment modal with this code -->

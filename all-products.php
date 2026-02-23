@@ -1,11 +1,9 @@
 <?php
-// Enable error reporting
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// Enable error reporting for development
+ini_set('display_errors', 0); // Set to 0 in production
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
-include_once('dbconnection.php');
-// ... rest of your code
 include_once('dbconnection.php');
 session_start();
 

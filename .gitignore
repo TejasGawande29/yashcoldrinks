@@ -2,10 +2,20 @@
 node_modules/
 
 # Zip files
-thumsup750.zip
+*.zip
 
 # IDE
 .vscode/
 
 # Build outputs
 dist/
+
+# Test and debug files
+debug_*.php
+test_*.php
+e2e_test.php
+*.crdownload
+
+# Development files
+gpt.html
+*copy.php

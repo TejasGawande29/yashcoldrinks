@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
+if (!isset($_SESSION["USERNAME"]) || !in_array($_SESSION["ROLE"], ["admin", "manager"])) {
     header("Location: adminlogin.php");
     exit;
 }
@@ -21,7 +21,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 
     <!-- jQuery & DataTables -->
-    <script src="../js/jquery.js"></script>
+    <script src="/YashColdrinks/assets/js/jquery.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
@@ -113,27 +113,36 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-    </style>k
+    </style>
 </head>
 
-<body class="bg-gradient-to-br from-white to-slate-100 text-gray-800 font-sans max-sm:mx-[-25px]">
-    <section class="max-w-full mx-auto p-4">
-        <div class="grid grid-cols-1 lg:grid-cols-[20%_auto] gap-6 min-h-screen">
+<body class="bg-gradient-to-br from-white to-slate-100 text-gray-800 font-sans">
+    <section class="max-w-screen-2xl mx-auto p-4 lg:p-6">
+        <div class="flex flex-col lg:flex-row gap-6 min-h-screen">
             <!-- Sidebar -->
-            <aside class="bg-white rounded-2xl shadow-md p-4 lg:p-6 sticky top-0 z-10">
+            <aside class="lg:w-64 flex-shrink-0">
                 <?php include 'layouts/sidebar.php'; ?>
                
             </aside>
             
             <!-- Main Content -->
-            <main class="bg-white rounded-2xl shadow-xl p-4 lg:p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-blue-700">📦 Order Management</h1>
-                    <div class="flex gap-3">
-                        <button id="refreshOrders" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2">
+            <main class="flex-1 min-w-0 bg-white rounded-2xl shadow-xl p-4 lg:p-8">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+                            <span class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-cyan-500/30">
+                                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                            </span>
+                            Order Management
+                        </h1>
+                        <p class="text-gray-500 mt-1 ml-13">Manage and track online orders.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button id="refreshOrders" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-blue-500/30 hover:scale-105 transition-all">
                             <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
                         </button>
-                        <select id="filterStatus" class="border rounded-md px-4 py-2 text-sm">
+                        <select id="filterStatus" class="form-select text-sm w-auto">
                             <option value="all">All Orders</option>
                             <option value="Pending">Pending</option>
                             <option value="Processing">Processing</option>
@@ -142,6 +151,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
                         </select>
                     </div>
                 </div>
+                <script>lucide.createIcons();</script>
 
                 <!-- Order Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 ">
@@ -183,7 +193,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
                 </div>
 
                 <!-- Order Details Modal -->
-                <div id="orderDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                <div id="orderDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
                     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
                         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6">
                             <div class="flex justify-between items-center">
@@ -530,7 +540,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
-                 CancelButton: true,
+                showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, delete it!'
@@ -610,8 +620,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
             document.getElementById('saveNote').addEventListener('click', function() {
                 const note = document.getElementById('orderNote').value.trim();
                 if (note) {
-                    // In a real implementation, you would save this to the database
-                    toastr.success("Note saved successfully");
+                    toastr.info("Note feature coming soon — notes are not yet saved to database");
                 } else {
                     toastr.warning("Please enter a note before saving");
                 }

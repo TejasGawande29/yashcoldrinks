@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
+if (!isset($_SESSION["USERNAME"]) || !in_array($_SESSION["ROLE"], ["admin", "manager"])) {
   header("Location: adminlogin.php");
   exit;
 }
@@ -16,14 +16,14 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
   <meta name="csrf-token" content="<?= $_SESSION['CSRF'] ?? '' ?>">
 
   <!-- TailwindCSS -->
-  <link href="dist/output.css" rel="stylesheet" />
+  <link href="output.css" rel="stylesheet" />
 
   <!-- AOS Animation -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 
   <!-- jQuery & DataTables -->
-  <script src="../js/jquery.js"></script>
+  <script src="/YashColdrinks/assets/js/jquery.js"></script>
   <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.css" />
 
@@ -63,19 +63,31 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
   </style>
 </head>
 
-<body class="bg-gray-100">
-  <div class="max-w-screen-2xl mx-auto p-4">
-    <div class="grid lg:grid-cols-[18rem_auto] gap-6">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100">
+  <div class="max-w-screen-2xl mx-auto p-4 lg:p-6">
+    <div class="flex flex-col lg:flex-row gap-6">
       <?php include 'layouts/sidebar.php'; ?>
 
-      <main class="bg-white h-[95vh] overflow-y-scroll rounded-2xl shadow-xl p-6">
-        <h1 class="text-3xl font-bold text-blue-700 mb-6">💰 Payment Management</h1>
+      <main class="flex-1 min-w-0 bg-white rounded-2xl shadow-xl p-6 lg:p-8 overflow-y-auto max-h-[calc(100vh-2rem)]">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+            <span class="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
+              <i data-lucide="credit-card" class="w-5 h-5"></i>
+            </span>
+            Payment Management
+          </h1>
+          <p class="text-gray-500 mt-1 ml-13">Track and manage all bill payments.</p>
+        </div>
+        
+        <script>lucide.createIcons();</script>
 
         <div class="mb-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Bills Overview</h2>
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">Bills Overview</h2>
             <div class="flex space-x-2">
-              <button id="refreshBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+              <button id="refreshBtn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/30 hover:scale-105 transition-all">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                 Refresh
               </button>
             </div>
@@ -119,11 +131,8 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
   </div>
 
   <script>
-    $(document).ready(function() {
-
-      
-      // Load bills
-      function loadBills() {
+    // Load bills - defined in global scope so makePayment() can call it
+    function loadBills() {
         $.ajax({
           url: "functions.php",
           type: "POST",
@@ -164,6 +173,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
         });
       }
 
+    $(document).ready(function() {
       // Initial load
       loadBills();
 
@@ -187,7 +197,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
                         <p>Date: ${bill.bill_date}</p>
                         <p>Counter: ${bill.counter_name}</p>
                         <p class="font-bold">Total: ₹${parseFloat(bill.total_bill_amount).toFixed(2)}</p>
-                        <p>Status: <span class="payment-badge ${bill.payment_status.toLowerCase()}">${bill.payment_status}</span></p>
+                        <p>Status: <span class="payment-badge ${bill.payment_status === 'Paid' ? 'paid' : bill.payment_status === 'Partially Paid' ? 'partial' : 'unpaid'}">${bill.payment_status}</span></p>
                     </div>
                     
                     <h4 class="font-bold mb-2">Items:</h4>

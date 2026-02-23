@@ -22,7 +22,7 @@ if (!isset($_SESSION["USERNAME"]) || $_SESSION["ROLE"] !== "admin") {
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 
     <!-- jQuery & DataTables -->
-    <script src="../js/jquery.js"></script>
+    <script src="/YashColdrinks/assets/js/jquery.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.css" />
 

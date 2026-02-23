@@ -1,8 +1,10 @@
 <?php
 session_start();
-if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["ROLE"] == "admin") {
+if (isset($_SESSION["USERNAME"]) && isset($_SESSION["ROLE"]) && ($_SESSION["ROLE"] == "admin" || $_SESSION["ROLE"] == "manager")) {
+  // User is authenticated
 } else {
   header("Location: adminlogin.php");
+  exit;
 }
 ?>
 <!DOCTYPE html>
@@ -16,7 +18,7 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
   <link rel="stylesheet" href="output.css">
 
   <!-- jquery -->
-  <script src="../js/jquery.js"></script>
+  <script src="/YashColdrinks/assets/js/jquery.js"></script>
 
   <!-- Tables -->
   <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
@@ -31,6 +33,9 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Fingerprint Auth -->
+  <script src="js/fingerprint.js"></script>
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -106,70 +111,194 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-sky-100 to-white min-h-screen text-gray-800 font-sans">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen text-gray-800 font-sans">
 
-  <section class="max-w-screen-2xl mx-auto p-4">
-    <div class="grid lg:grid-cols-[18rem_auto] gap-6">
+  <section class="max-w-screen-2xl mx-auto p-4 lg:p-6">
+    <div class="flex flex-col lg:flex-row gap-6">
 
       <!-- Sidebar -->
       <?php include 'layouts/sidebar.php'; ?>
 
-
-
       <!-- Main Content -->
-      <div class="bg-white rounded-3xl shadow-2xl p-8 transition-colors duration-500 ease-in-out fade-in-up">
-        <h1 class="text-4xl font-extrabold mb-8 text-sky-700 drop-shadow-md">
-          📊 Dashboard
-        </h1>
-        <!-- Add this toggle button somewhere appropriate, e.g., top right corner -->
-        <button
-          id="themeToggleBtn"
-          class=" max-sm:text-[10px] fixed top-4 right-4 z-50 bg-gray-200 rounded-full shadow hover:bg-gray-300 transition
-         px-3 py-1 text-xs
-         sm:px-4 sm:py-2 sm:text-sm">
-          🌙 Dark Mode
-        </button>
+      <div class="flex-1 min-w-0 bg-white rounded-2xl shadow-xl p-6 lg:p-8 transition-colors duration-500 ease-in-out fade-in-up">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+              <span class="w-10 h-10 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              </span>
+              Dashboard
+            </h1>
+            <p class="text-gray-500 mt-1">Welcome back! Here's your business overview.</p>
+          </div>
+          <button
+            id="themeToggleBtn"
+            class="mt-4 sm:mt-0 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-xl px-4 py-2 text-sm font-medium transition-all">
+            <i data-lucide="moon" class="w-4 h-4"></i>
+            <span>Dark Mode</span>
+          </button>
+        </div>
 
-
-
-
-
-
+        <!-- Fingerprint Setup Banner -->
+        <div id="fingerprintBanner" class="hidden mb-6 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/20 relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"/>
+                  <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.12-1.37.34-2"/>
+                  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
+                  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+                  <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
+                  <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
+                  <path d="M2 16h.01"/>
+                  <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
+                  <path d="M9 6.8a6 6 0 0 1 9 5.2c0 .47 0 1.17-.02 2"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold">Enable Fingerprint Login</h3>
+                <p class="text-emerald-100 text-sm">Skip typing passwords — login with just your fingerprint next time!</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="setupFingerprint()" id="setupFpBtn"
+                class="bg-white text-emerald-600 hover:bg-emerald-50 font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg text-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"/>
+                  <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.12-1.37.34-2"/>
+                  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+                  <path d="M9 6.8a6 6 0 0 1 9 5.2c0 .47 0 1.17-.02 2"/>
+                </svg>
+                Setup Now
+              </button>
+              <button onclick="dismissFpBanner()" class="text-white/70 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors" title="Dismiss">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Stats Boxes -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="relative bg-gradient-to-r from-white via-sky-100 to-sky-200 border border-sky-300 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 hover:scale-[1.03] transition-all duration-400 ease-in-out">
-            <h2 class="text-xl font-semibold text-sky-800 mb-4 tracking-wide drop-shadow-sm">
-              📦 Total Available Stock
-            </h2>
-            <ul id="stock-list" class="list-disc pl-6 text-base text-gray-700 space-y-1 leading-relaxed"></ul>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Total Stock Card -->
+          <div class="relative bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-72">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="flex items-center gap-4 mb-4 flex-shrink-0">
+              <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                <i data-lucide="package" class="w-6 h-6"></i>
+              </div>
+              <h2 class="text-lg font-semibold text-gray-800">Total Stock</h2>
+            </div>
+            <ul id="stock-list" class="space-y-2 text-sm text-gray-600 overflow-y-auto flex-1 pr-2 scrollbar-thin"></ul>
           </div>
 
-          <div class="relative bg-gradient-to-r from-white via-green-100 to-green-200 border border-green-300 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 hover:scale-[1.03] transition-all duration-400 ease-in-out">
-            <h2 class="text-xl font-semibold text-green-800 mb-4 tracking-wide drop-shadow-sm">
-              🧾 Today's Sell
-            </h2>
-            <ul id="todaySell" class="list-disc pl-6 text-base text-gray-700 space-y-1 leading-relaxed"></ul>
+          <!-- Today's Sell Card -->
+          <div class="relative bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-72">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="flex items-center gap-4 mb-4 flex-shrink-0">
+              <div class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+              </div>
+              <h2 class="text-lg font-semibold text-gray-800">Today's Sales</h2>
+            </div>
+            <ul id="todaySell" class="space-y-2 text-sm text-gray-600 overflow-y-auto flex-1 pr-2 scrollbar-thin"></ul>
           </div>
 
-          <div class="relative bg-gradient-to-r from-white via-yellow-100 to-yellow-200 border border-yellow-300 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 hover:scale-[1.03] transition-all duration-400 ease-in-out">
-            <h2 id="earningHeading" class="text-xl font-semibold text-yellow-800 mb-4 tracking-wide drop-shadow-sm">
-              💰 Today's Earning
-            </h2>
-            <ul id="todayearning" class="list-disc pl-6 text-base text-gray-700 space-y-1 leading-relaxed"></ul>
+          <!-- Today's Earning Card -->
+          <div class="relative bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-72">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="flex items-center gap-4 mb-4 flex-shrink-0">
+              <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
+                <i data-lucide="indian-rupee" class="w-6 h-6"></i>
+              </div>
+              <h2 id="earningHeading" class="text-lg font-semibold text-gray-800">Today's Earnings</h2>
+            </div>
+            <ul id="todayearning" class="space-y-2 text-sm text-gray-600 overflow-y-auto flex-1 pr-2 scrollbar-thin"></ul>
           </div>
         </div>
 
         <!-- Chart -->
-        <div class="bg-white rounded-3xl border border-gray-300 shadow-xl mt-12 p-8 transition-colors duration-500 ease-in-out">
-          <h2 class="text-2xl font-extrabold mb-6 text-gray-900 tracking-tight drop-shadow-md">
-            📈 Monthly Sales & Earnings
-          </h2>
-          <canvas id="myChart" class="w-full h-[380px] rounded-xl shadow-md ring-1 ring-gray-200"></canvas>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 transition-colors duration-500 ease-in-out">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Monthly Sales & Earnings</h2>
+          </div>
+          <canvas id="myChart" class="w-full h-[350px] rounded-xl"></canvas>
         </div>
       </div>
     </div>
   </section>
+
+  <script>
+    lucide.createIcons();
+
+    // ─── Fingerprint Setup Banner ─────────────────────────────
+    (async function() {
+      // Only show if browser supports fingerprint and user hasn't dismissed it
+      if (typeof FingerprintAuth === 'undefined' || !FingerprintAuth.isSupported()) return;
+      
+      const available = await FingerprintAuth.isPlatformAvailable();
+      if (!available) return;
+
+      // Check if user dismissed the banner
+      if (localStorage.getItem('fp_banner_dismissed') === 'true') return;
+
+      // Check if user already has fingerprints registered
+      try {
+        const creds = await FingerprintAuth.getCredentials();
+        if (creds.credentials && creds.credentials.length > 0) return; // Already registered
+      } catch(e) { /* ignore */ }
+
+      // Show the banner
+      document.getElementById('fingerprintBanner').classList.remove('hidden');
+    })();
+
+    async function setupFingerprint() {
+      const btn = document.getElementById('setupFpBtn');
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning...';
+      btn.disabled = true;
+
+      try {
+        const result = await FingerprintAuth.register('My Device');
+        if (result.success) {
+          toastr.success('Fingerprint registered! You can now login with fingerprint.', 'Success', {timeOut: 5000});
+          document.getElementById('fingerprintBanner').innerHTML = `
+            <div class="flex items-center gap-4 p-2">
+              <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold">Fingerprint Registered!</h3>
+                <p class="text-emerald-100 text-sm">Next time, you can login by just scanning your fingerprint.</p>
+              </div>
+            </div>
+          `;
+          setTimeout(() => {
+            document.getElementById('fingerprintBanner').classList.add('hidden');
+          }, 5000);
+        } else {
+          toastr.error(result.error || 'Registration failed');
+          btn.innerHTML = originalHTML;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        toastr.error(err.message);
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+      }
+    }
+
+    function dismissFpBanner() {
+      localStorage.setItem('fp_banner_dismissed', 'true');
+      document.getElementById('fingerprintBanner').classList.add('hidden');
+    }
+  </script>
 
   <script>
     // Dark mode toggle logic   
@@ -179,18 +308,20 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
     // Load theme preference on page load   
     if (localStorage.getItem("theme") === "dark") {
       body.classList.add("dark-mode");
-      toggleBtn.textContent = "☀️ Light Mode";
+      toggleBtn.innerHTML = '<i data-lucide="sun" class="w-4 h-4"></i><span>Light Mode</span>';
+      lucide.createIcons();
     }
 
     toggleBtn.addEventListener("click", () => {
       body.classList.toggle("dark-mode");
       if (body.classList.contains("dark-mode")) {
         localStorage.setItem("theme", "dark");
-        toggleBtn.textContent = "☀️ Light Mode";
+        toggleBtn.innerHTML = '<i data-lucide="sun" class="w-4 h-4"></i><span>Light Mode</span>';
       } else {
         localStorage.setItem("theme", "light");
-        toggleBtn.textContent = "🌙 Dark Mode";
+        toggleBtn.innerHTML = '<i data-lucide="moon" class="w-4 h-4"></i><span>Dark Mode</span>';
       }
+      lucide.createIcons();
     });
   </script>
 
@@ -209,7 +340,7 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
           var stockList = $("#stock-list");
           stockList.empty(); // Clear existing items           
           jobj.forEach(function(item) {
-            stockList.append("<li>" + item[0] + "ml" + "==>" + "<strong>" + item[1] + "</strong>" + " Boxes" + "</li>");
+            stockList.append('<li class="flex items-center justify-between py-1 px-3 bg-blue-50 rounded-lg"><span class="font-medium">' + item[0] + 'ml</span><span class="font-bold text-blue-600">' + item[1] + ' Boxes</span></li>');
           });
 
         },
@@ -231,7 +362,7 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
           const todaySell = $("#todaySell");
           todaySell.empty();
           jobj.forEach(function(item) {
-            todaySell.append("<li>" + item[0] + "ml" + "==>" + "<strong>" + item[1] + "</strong>" + " Boxes" + "</li>");
+            todaySell.append('<li class="flex items-center justify-between py-1 px-3 bg-emerald-50 rounded-lg"><span class="font-medium">' + item[0] + 'ml</span><span class="font-bold text-emerald-600">' + item[1] + ' Boxes</span></li>');
           });
 
         },
@@ -250,7 +381,8 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
           const jobj = JSON.parse(res);
           console.log("sum data: ");
           console.log(jobj);
-          earningHeading.innerHTML = "Today's Earning:<span style='color:green; font-weight: bold;'>(" + jobj[0][0] + "Rs)</span>"; // Update the heading with the sum of earnings          
+          const totalEarning = jobj[0][0] || 0;
+          document.getElementById("earningHeading").innerHTML = 'Today\'s Earnings <span class="text-emerald-500 font-bold">(₹' + totalEarning + ')</span>';
 
         },
         error: function() {
@@ -272,7 +404,7 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
           const todaySell = $("#todayearning");
           todaySell.empty();
           for (let i = 0; i < jobj.length; i++) {
-            todaySell.append("<li>" + jobj[i][0] + "ml" + "==>" + "<strong>" + jobj[i][1] + "</strong>" + " Rs" + "</li>");
+            todaySell.append('<li class="flex items-center justify-between py-1 px-3 bg-amber-50 rounded-lg"><span class="font-medium">' + jobj[i][0] + 'ml</span><span class="font-bold text-amber-600">₹' + jobj[i][1] + '</span></li>');
           }
         },
         error: function() {

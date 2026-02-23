@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["USERNAME"]) || !isset($_SESSION["PASSWORD"]) || $_SESSION["ROLE"] !== "admin") {
+if (!isset($_SESSION["USERNAME"]) || !isset($_SESSION["ROLE"]) || $_SESSION["ROLE"] !== "admin") {
     echo json_encode(["status" => "error", "message" => "Unauthorized access"]);
     exit;
 }

@@ -264,7 +264,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 📞 Contact
 
-**Developer**: Yash  
+**Developer**: Tejas  
 **Project Link**: [https://github.com/YOUR_USERNAME/YashColdrinks](https://github.com/YOUR_USERNAME/YashColdrinks)
 
 ---

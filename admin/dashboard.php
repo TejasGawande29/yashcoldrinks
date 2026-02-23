@@ -1,8 +1,10 @@
 <?php
 session_start();
-if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["ROLE"] == "admin") {
+if (isset($_SESSION["USERNAME"]) && isset($_SESSION["ROLE"]) && ($_SESSION["ROLE"] == "admin" || $_SESSION["ROLE"] == "manager")) {
+  // User is authenticated
 } else {
   header("Location: adminlogin.php");
+  exit;
 }
 ?>
 <!DOCTYPE html>
@@ -16,7 +18,7 @@ if (isset($_SESSION["USERNAME"]) && isset($_SESSION["PASSWORD"]) && $_SESSION["R
   <link rel="stylesheet" href="output.css">
 
   <!-- jquery -->
-  <script src="../js/jquery.js"></script>
+  <script src="/YashColdrinks/assets/js/jquery.js"></script>
 
   <!-- Tables -->
   <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>

@@ -1,3 +1,19 @@
+<?php
+/**
+ * Root Index - Redirect to Customer Portal
+ * YashColdrinks
+ * 
+ * This file redirects users to the new customer portal location
+ * Remove this redirect to keep original homepage
+ */
+
+// Dynamic redirect that works in both local and production
+$base_url = (isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http') . '://' . $_SERVER['HTTP_HOST'];
+$redirect_path = '/customer/index.php';
+
+header("Location: " . $redirect_path);
+exit;
+?>
 <!DOCTYPE html>
 <html lang="en">
 

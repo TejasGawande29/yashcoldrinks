@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ColdDrinks - Project Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --primary: #6d28d9;
+            --primary-light: #8b5cf6;
+            --primary-bg: #f5f3ff;
+            --accent: #2563eb;
+            --accent-bg: #eff6ff;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+            font-size: 11pt;
+        }
+
+        /* Print styles */
+        @media print {
+            body { font-size: 10pt; }
+            .page-break { page-break-before: always; }
+            .no-break { page-break-inside: avoid; }
+            .cover-page { page-break-after: always; }
+            h2 { page-break-before: always; }
+            h2:first-of-type { page-break-before: avoid; }
+            table { page-break-inside: avoid; }
+            pre { page-break-inside: avoid; }
+            .mermaid-container { page-break-inside: avoid; }
+        }
+
+        /* ─── Cover Page ─── */
+        .cover-page {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: rgb(255, 255, 255);
+            text-align: center;
+            padding: 60px 40px;
+        }
+        .cover-page h1 {
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+        .cover-page .subtitle {
+            font-size: 16pt;
+            font-weight: 300;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+        .cover-page .meta {
+            font-size: 11pt;
+            opacity: 0.8;
+            line-height: 2;
+        }
+        .cover-page .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 10pt;
+            margin: 4px;
+        }
+        .cover-divider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+            margin: 30px 0;
+        }
+
+        /* ─── Content Area ─── */
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 50px;
+        }
+
+        /* ─── Table of Contents ─── */
+        .toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px 40px;
+            margin: 30px 0 40px;
+        }
+        .toc h2 {
+            page-break-before: avoid !important;
+            font-size: 18pt;
+            color: var(--primary);
+            margin-bottom: 16px;
+            border: none;
+            padding: 0;
+        }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc-counter;
+            padding: 0;
+        }
+        .toc ol li {
+            counter-increment: toc-counter;
+            padding: 6px 0;
+            border-bottom: 1px dotted var(--border);
+            font-size: 11pt;
+        }
+        .toc ol li::before {
+            content: counter(toc-counter) ".";
+            font-weight: 700;
+            color: var(--primary);
+            margin-right: 10px;
+            min-width: 28px;
+            display: inline-block;
+        }
+        .toc ol li:last-child { border-bottom: none; }
+
+        /* ─── Headings ─── */
+        h2 {
+            font-size: 20pt;
+            font-weight: 800;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin: 50px 0 24px;
+            letter-spacing: -0.5px;
+        }
+        h3 {
+            font-size: 14pt;
+            font-weight: 700;
+            color: var(--text);
+            margin: 30px 0 14px;
+        }
+        h4 {
+            font-size: 12pt;
+            font-weight: 600;
+            color: var(--text-light);
+            margin: 20px 0 10px;
+        }
+
+        /* ─── Paragraphs & Lists ─── */
+        p { margin: 10px 0; }
+        ul, ol { margin: 10px 0; padding-left: 24px; }
+        li { margin: 4px 0; }
+
+        /* ─── Blockquote ─── */
+        blockquote {
+            border-left: 4px solid var(--primary);
+            background: var(--primary-bg);
+            padding: 14px 20px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--primary);
+        }
+
+        /* ─── Tables ─── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 10pt;
+        }
+        thead th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 9.5pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        thead th:first-child { border-radius: 8px 0 0 0; }
+        thead th:last-child { border-radius: 0 8px 0 0; }
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tbody tr:nth-child(even) { background: var(--bg-alt); }
+        tbody tr:hover { background: var(--primary-bg); }
+        tbody tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        tbody tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+
+        /* ─── Code Blocks ─── */
+        code {
+            font-family: 'Fira Code', monospace;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9.5pt;
+            color: #be185d;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px 24px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 9pt;
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            font-size: inherit;
+        }
+
+        /* ─── Info/Callout Boxes ─── */
+        .info-box {
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-left: 4px solid;
+        }
+        .info-box.blue { background: var(--accent-bg); border-color: var(--accent); }
+        .info-box.green { background: var(--success-bg); border-color: var(--success); }
+        .info-box.yellow { background: var(--warning-bg); border-color: var(--warning); }
+        .info-box.red { background: var(--danger-bg); border-color: var(--danger); }
+
+        /* ─── Status Badges ─── */
+        .badge-complete {
+            display: inline-block;
+            background: var(--success-bg);
+            color: var(--success);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: 600;
+        }
+        .badge-demo {
+            display: inline-block;
+            background: var(--warning-bg);
+            color: var(--warning);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: 600;
+        }
+
+        /* ─── Mermaid Diagrams ─── */
+        .mermaid-container {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .mermaid-container .diagram-title {
+            font-size: 13pt;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .mermaid svg {
+            max-width: 100% !important;
+        }
+
+        /* ─── File Tree ─── */
+        .file-tree {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 24px 28px;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 9.5pt;
+            line-height: 1.8;
+            margin: 16px 0;
+        }
+        .file-tree .folder { color: #60a5fa; font-weight: 600; }
+        .file-tree .file { color: #a5b4fc; }
+        .file-tree .comment { color: #64748b; }
+        .file-tree .highlight { color: #34d399; font-weight: 600; }
+
+        /* ─── Section Divider ─── */
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+            margin: 40px 0;
+        }
+
+        /* ─── Footer ─── */
+        .doc-footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+            font-size: 9pt;
+            border-top: 2px solid var(--border);
+            margin-top: 50px;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 10px 0 20px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9pt;
+            font-weight: 700;
+        }
+
+        /* Keyword highlight */
+        strong { color: #1e293b; }
+
+        /* Architecture box */
+        .arch-box {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #e2e8f0;
+            padding: 28px;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 9pt;
+            line-height: 1.5;
+            margin: 16px 0;
+            white-space: pre;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ COVER PAGE ═══════════════════════ -->
+<div class="cover-page">
+    <h1> ColdDrinks</h1>
+    <div class="cover-divider"></div>
+    <div class="subtitle">
+        A Web-Based Inventory &amp; Business Management System for a Cold Drinks Distribution Shop
+    </div>
+    <div>
+        <span class="badge">PHP</span>
+        <span class="badge">MySQL</span>
+        <span class="badge">Tailwind CSS</span>
+        <span class="badge">jQuery</span>
+        <span class="badge">XAMPP</span>
+    </div>
+    <div class="cover-divider"></div>
+    <div class="meta">
+        <strong>Project Type:</strong> Web Application (Admin Panel)<br>
+        <strong>Architecture:</strong> Three-Tier Client-Server<br>
+        <strong>Database:</strong> MySQL <br>
+        <strong>Date:</strong> February 2026
+    </div>
+</div>
+
+<!-- ═══════════════════════ CONTENT ═══════════════════════ -->
+<div class="content">
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc no-break">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li>Project Overview</li>
+            <li>Terminology &amp; Definitions</li>
+            <li>Technology Stack</li>
+            <li>Workspace File Structure</li>
+            <li>Database Schema</li>
+            <li>System Architecture Diagram</li>
+            <li>Application Flow Diagrams</li>
+            <li>Module-Wise Explanation</li>
+            <li>Authentication &amp; Security</li>
+            <li>Frontend Libraries Used</li>
+            <li>How to Run the Project</li>
+            <li>Development Progress</li>
+        </ol>
+    </div>
+
+    <!-- ═══════════════════════ 1. PROJECT OVERVIEW ═══════════════════════ -->
+    <h2>1. Project Overview</h2>
+    <p>
+        <strong> ColdDrinks</strong> is a web-based business management system built for a cold drinks distribution shop.
+        The application helps the shop owner (admin) manage day-to-day operations including:
+    </p>
+    <ul>
+        <li><strong>Stock/Inventory Management</strong> — Track purchased stock from agencies (distributors)</li>
+        <li><strong>Sales &amp; Billing</strong> — Create sell receipts and manage counter-based billing</li>
+        <li><strong>Payment Tracking</strong> — Monitor paid, unpaid, and partial payments to agencies</li>
+        <li><strong>Expense Management</strong> — Record and categorize business expenses</li>
+        <li><strong>Salary Management</strong> — Manage employee salaries and payment history</li>
+        <li><strong>Audit &amp; Reporting</strong> — View financial summaries with charts and analytics</li>
+        <li><strong>Order Management</strong> — Track online/customer orders with status tracking</li>
+        <li><strong>Account Management</strong> — Manage admin/manager/staff user accounts</li>
+    </ul>
+    <p>
+        The system follows a <strong>client-server architecture</strong> using PHP as the backend, MySQL (MySQL) as the database,
+        and a modern responsive UI built with Tailwind CSS.
+    </p>
+
+    <!-- ═══════════════════════ 2. TERMINOLOGY ═══════════════════════ -->
+    <h2>2. Terminology &amp; Definitions</h2>
+    <table>
+        <thead>
+            <tr><th>Term</th><th>Definition</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>XAMPP</strong></td><td>A free, open-source cross-platform web server solution stack containing Apache HTTP Server, MySQL database, and PHP interpreter. Used to host this project locally.</td></tr>
+            <tr><td><strong>PHP</strong></td><td><em>Hypertext Preprocessor</em> — A server-side scripting language used for web development. Handles all backend logic in this project.</td></tr>
+            <tr><td><strong>MySQL / MySQL</strong></td><td>A relational database management system (RDBMS) used to store and manage all application data (stocks, bills, expenses, etc.).</td></tr>
+            <tr><td><strong>Tailwind CSS</strong></td><td>A utility-first CSS framework for rapidly building custom user interfaces without writing traditional CSS.</td></tr>
+            <tr><td><strong>jQuery</strong></td><td>A fast, lightweight JavaScript library that simplifies HTML DOM manipulation, AJAX calls, and event handling.</td></tr>
+            <tr><td><strong>AJAX</strong></td><td><em>Asynchronous JavaScript and XML</em> — A technique for sending/receiving data from the server without refreshing the entire page.</td></tr>
+            <tr><td><strong>DataTables</strong></td><td>A jQuery plugin that adds advanced features (search, sort, pagination) to HTML tables.</td></tr>
+            <tr><td><strong>Alpine.js</strong></td><td>A lightweight JavaScript framework for adding interactivity (dropdowns, modals, toggles) directly in HTML markup.</td></tr>
+            <tr><td><strong>Toastr</strong></td><td>A JavaScript library for showing non-blocking notification pop-ups (success, error, info messages).</td></tr>
+            <tr><td><strong>SweetAlert2</strong></td><td>A beautiful, responsive, customizable replacement for JavaScript's popup alert boxes.</td></tr>
+            <tr><td><strong>Lucide Icons</strong></td><td>An open-source icon library providing clean, consistent SVG icons used throughout the UI.</td></tr>
+            <tr><td><strong>Chart.js</strong></td><td>A JavaScript charting library used to render bar charts and doughnut charts in the Audit Dashboard.</td></tr>
+            <tr><td><strong>Session</strong></td><td>A server-side mechanism to store user information (login state, role) across multiple page requests.</td></tr>
+            <tr><td><strong>MD5</strong></td><td>A cryptographic hash function used here to hash user passwords before storing in the database.</td></tr>
+            <tr><td><strong>CRUD</strong></td><td><em>Create, Read, Update, Delete</em> — The four basic operations performed on database records.</td></tr>
+            <tr><td><strong>Stock</strong></td><td>Inventory of cold drink products (boxes) purchased from agencies/distributors.</td></tr>
+            <tr><td><strong>Agency</strong></td><td>A distributor/supplier from whom cold drinks are purchased (e.g., Coca-Cola Distributors).</td></tr>
+            <tr><td><strong>Counter</strong></td><td>A point-of-sale station in the shop where products are sold to customers.</td></tr>
+            <tr><td><strong>Bill</strong></td><td>A sales receipt generated when products are sold to a customer from a counter.</td></tr>
+            <tr><td><strong>Scheme</strong></td><td>Promotional offers where bonus bottles are given free with a purchase (e.g., buy X get Y free).</td></tr>
+            <tr><td><strong>Payment Status</strong></td><td>Tracks whether a stock purchase or bill has been <em>Paid</em>, <em>Unpaid</em>, or <em>Partially Paid</em>.</td></tr>
+            <tr><td><strong>Audit</strong></td><td>A financial review showing total sales, expenses, profit, and cash flow analytics.</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════ 3. TECHNOLOGY STACK ═══════════════════════ -->
+    <h2>3. Technology Stack</h2>
+    <table>
+        <thead>
+            <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Server</strong></td><td>XAMPP (Apache)</td><td>Hosts the PHP application locally</td></tr>
+            <tr><td><strong>Backend</strong></td><td>PHP 8.x</td><td>Server-side logic, database queries, session management</td></tr>
+            <tr><td><strong>Database</strong></td><td>MySQL </td><td>Data storage and retrieval</td></tr>
+            <tr><td><strong>Frontend</strong></td><td>HTML5, Tailwind CSS</td><td>Page structure and responsive styling</td></tr>
+            <tr><td><strong>Interactivity</strong></td><td>jQuery, Alpine.js</td><td>DOM manipulation, AJAX, UI components</td></tr>
+            <tr><td><strong>Tables</strong></td><td>DataTables 2.3.0</td><td>Sortable, searchable, paginated data tables</td></tr>
+            <tr><td><strong>Notifications</strong></td><td>Toastr, SweetAlert2</td><td>User feedback messages and alerts</td></tr>
+            <tr><td><strong>Icons</strong></td><td>Lucide Icons</td><td>Scalable vector icons</td></tr>
+            <tr><td><strong>Charts</strong></td><td>Chart.js</td><td>Data visualization (bar, doughnut charts)</td></tr>
+            <tr><td><strong>Animations</strong></td><td>AOS, CSS Keyframes</td><td>Scroll and page-load animations</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════ 4. FILE STRUCTURE ═══════════════════════ -->
+    <h2>4. Workspace File Structure</h2>
+
+    <img src="./assets/images/image.png" alt="">
+
+    <h3>File Categorization</h3>
+    <table>
+        <thead>
+            <tr><th>Category</th><th>Files</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Configuration</strong></td><td><code>dbconnection.php</code></td><td>Database credentials &amp; connection setup</td></tr>
+            <tr><td><strong>Database</strong></td><td><code>coldrinks_demo.sql</code></td><td>Complete SQL dump to recreate the database</td></tr>
+            <tr><td><strong>Authentication</strong></td><td><code>adminlogin.php</code>, <code>logout.php</code>, <code>logout_modal.php</code></td><td>Login/logout flow</td></tr>
+            <tr><td><strong>Backend API</strong></td><td><code>functions.php</code></td><td>Centralized PHP function handler (switch-case router)</td></tr>
+            <tr><td><strong>Dashboard</strong></td><td><code>index.php</code></td><td>Main landing page after login</td></tr>
+            <tr><td><strong>Stock Module</strong></td><td><code>addStock.php</code>, <code>viewstocks.php</code></td><td>Inventory management (fully functional)</td></tr>
+            <tr><td><strong>Sales Module</strong></td><td><code>sellReceipt.php</code>, <code>sellDashboard.php</code></td><td>Billing and payment (UI demo)</td></tr>
+            <tr><td><strong>Orders Module</strong></td><td><code>order_management.php</code></td><td>Online order tracking (UI demo)</td></tr>
+            <tr><td><strong>Finance Module</strong></td><td><code>expense.php</code>, <code>salary.php</code>, <code>audit.php</code></td><td>Financial management (UI demo)</td></tr>
+            <tr><td><strong>Settings</strong></td><td><code>updateList.php</code>, <code>account.php</code></td><td>Master data &amp; user management (UI demo)</td></tr>
+            <tr><td><strong>Layout</strong></td><td><code>layouts/sidebar.php</code></td><td>Reusable navigation sidebar</td></tr>
+            <tr><td><strong>Assets</strong></td><td><code>output.css</code>, <code>logo.png</code>, <code>jquery.js</code></td><td>Static resources</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════ 5. DATABASE SCHEMA ═══════════════════════ -->
+    <h2>5. Database Schema</h2>
+    <p>The database <code>coldrinks_demo</code> contains <strong>12 tables</strong>:</p>
+
+    <h3>Core Tables</h3>
+    <table>
+        <thead>
+            <tr><th>Table</th><th>Purpose</th><th>Key Columns</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>admin</code></td><td>Store admin/manager user accounts</td><td><code>id</code>, <code>username</code>, <code>password</code> (MD5), <code>mobile</code>, <code>role</code></td></tr>
+            <tr><td><code>stock</code></td><td>Current stock inventory purchased from agencies</td><td><code>id</code>, <code>productname</code>, <code>quantity</code>, <code>totalbillamount</code>, <code>paid_amount</code>, <code>payment_status</code>, <code>agencyname</code>, <code>buydate</code></td></tr>
+            <tr><td><code>totalstocksadded</code></td><td>Audit log of all stock additions</td><td>Same columns as <code>stock</code></td></tr>
+            <tr><td><code>productlist</code></td><td>Master list of available products</td><td><code>id</code>, <code>productname</code></td></tr>
+            <tr><td><code>agencylist</code></td><td>Master list of supplier agencies</td><td><code>id</code>, <code>agencyName</code></td></tr>
+            <tr><td><code>counterlist</code></td><td>Master list of sale counters</td><td><code>id</code>, <code>counterName</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Sales &amp; Billing Tables</h3>
+    <table>
+        <thead>
+            <tr><th>Table</th><th>Purpose</th><th>Key Columns</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>bills</code></td><td>Sales bill header records</td><td><code>id</code>, <code>counter_name</code>, <code>total_bill_amount</code>, <code>paid_amount</code>, <code>payment_status</code>, <code>bill_date</code></td></tr>
+            <tr><td><code>bill_items</code></td><td>Individual items within a bill</td><td><code>id</code>, <code>bill_id</code> (FK → bills), <code>productname</code>, <code>quantity</code>, <code>totalamount</code></td></tr>
+            <tr><td><code>sell</code></td><td>Sales transaction records</td><td><code>id</code>, <code>bill_id</code>, <code>productname</code>, <code>quantity</code>, <code>totalbillamount</code>, <code>countername</code></td></tr>
+            <tr><td><code>payments</code></td><td>Payment records against bills</td><td><code>id</code>, <code>bill_id</code> (FK → bills), <code>amount_paid</code>, <code>payment_method</code>, <code>payment_type</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Other Tables</h3>
+    <table>
+        <thead>
+            <tr><th>Table</th><th>Purpose</th><th>Key Columns</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>orders</code></td><td>Customer online orders</td><td><code>id</code>, <code>customer_name</code>, <code>phone</code>, <code>total_amount</code>, <code>status</code></td></tr>
+            <tr><td><code>order_items</code></td><td>Items within each order</td><td><code>id</code>, <code>order_id</code> (FK), <code>product_id</code>, <code>quantity</code>, <code>price</code></td></tr>
+            <tr><td><code>products</code></td><td>Product catalog with descriptions</td><td><code>id</code>, <code>name</code>, <code>price</code>, <code>category</code>, <code>stock_quantity</code></td></tr>
+            <tr><td><code>expenses</code></td><td>Business expense records</td><td><code>id</code>, <code>expense_date</code>, <code>expense_type</code>, <code>amount</code>, <code>description</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Sample Data Included</h3>
+    <table>
+        <thead>
+            <tr><th>Product</th><th>Stock (Boxes)</th><th>Price/Box (₹)</th><th>Agency</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>ThumsUp-250</td><td>20</td><td>520</td><td>Coca-Cola Distributors</td></tr>
+            <tr><td>Sprite-250</td><td>15</td><td>500</td><td>Coca-Cola Distributors</td></tr>
+            <tr><td>Fanta-250</td><td>10</td><td>480</td><td>PepsiCo Agency</td></tr>
+            <tr><td>Coca-Cola-250</td><td>25</td><td>520</td><td>Local Traders</td></tr>
+            <tr><td>Limca-250</td><td>12</td><td>460</td><td>Coca-Cola Distributors</td></tr>
+            <tr><td>Maaza-250</td><td>18</td><td>540</td><td>PepsiCo Agency</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════ 5.1 ER DIAGRAM ═══════════════════════ -->
+    <h3>Entity-Relationship Diagram</h3>
+    <div class="mermaid-container no-break">
+        <div class="diagram-title">Database ER Diagram</div>
+        <div class="mermaid">
+erDiagram
+    admin {
+        int id PK
+        varchar username
+        varchar password
+        varchar mobile
+        varchar role
+    }
+    productlist {
+        int id PK
+        varchar productname
+    }
+    agencylist {
+        int id PK
+        varchar agencyName
+    }
+    counterlist {
+        int id PK
+        varchar counterName
+    }
+    stock {
+        int id PK
+        varchar productname
+        int quantity
+        double totalbillamount
+        double paid_amount
+        enum payment_status
+        varchar agencyname
+    }
+    totalstocksadded {
+        int id PK
+        varchar productname
+        int quantity
+        double totalbillamount
+        varchar agencyname
+    }
+    bills {
+        int id PK
+        varchar counter_name
+        double total_bill_amount
+        double paid_amount
+        enum payment_status
+    }
+    bill_items {
+        int id PK
+        int bill_id FK
+        varchar productname
+        int quantity
+        double totalamount
+    }
+    sell {
+        int id PK
+        int bill_id FK
+        varchar productname
+        int quantity
+        double totalbillamount
+    }
+    payments {
+        int id PK
+        int bill_id FK
+        double amount_paid
+        varchar payment_method
+    }
+    orders {
+        int id PK
+        varchar customer_name
+        decimal total_amount
+        enum status
+    }
+    order_items {
+        int id PK
+        int order_id FK
+        int product_id FK
+        int quantity
+    }
+    products {
+        int id PK
+        varchar name
+        decimal price
+        varchar category
+    }
+    expenses {
+        int id PK
+        date expense_date
+        varchar expense_type
+        double amount
+    }
+    bills ||--o{ bill_items : "contains"
+    bills ||--o{ payments : "has"
+    bills ||--o{ sell : "generates"
+    orders ||--o{ order_items : "contains"
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ 6. SYSTEM ARCHITECTURE ═══════════════════════ -->
+    <h2>6. System Architecture</h2>
+    <p>The project uses a <strong>three-tier architecture</strong>:</p>
+
+    <div class="mermaid-container no-break">
+        <div class="diagram-title">Three-Tier System Architecture</div>
+        <div class="mermaid">
+graph TB
+    subgraph PL["🖥️ PRESENTATION LAYER (Browser)"]
+        direction LR
+        A1["Dashboard<br>index.php"]
+        A2["Add Stock<br>addStock.php"]
+        A3["View Stock<br>viewstocks.php"]
+        A4["Sell Receipt<br>sellReceipt.php"]
+        A5["Other Pages<br>..."]
+    end
+
+    subgraph AL["⚙️ APPLICATION LAYER (PHP Backend)"]
+        direction TB
+        B1["functions.php<br>───────────<br>Switch-Case Router"]
+        B2["LOGIN"]
+        B3["INSERT_STOCK"]
+        B4["GET_TOTAL_STOCK"]
+        B5["UPDATE_STOCK_PAYMENT"]
+        B6["GET_PRODUCT_NAME"]
+        B1 --- B2
+        B1 --- B3
+        B1 --- B4
+        B1 --- B5
+        B1 --- B6
+    end
+
+    subgraph DL["🗄️ DATA LAYER (MySQL)"]
+        direction LR
+        C1["admin"]
+        C2["stock"]
+        C3["bills"]
+        C4["sell"]
+        C5["orders"]
+        C6["expenses"]
+        C7["products"]
+    end
+
+    PL -->|"AJAX POST (jQuery $.post)"| AL
+    AL -->|"MySQLi Prepared Statements"| DL
+    DL -->|"Result Sets"| AL
+    AL -->|"JSON Response"| PL
+
+    style PL fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style AL fill:#f5f3ff,stroke:#7c3aed,stroke-width:2px
+    style DL fill:#ecfdf5,stroke:#059669,stroke-width:2px
+        </div>
+    </div>
+
+    <h3>How Data Flows</h3>
+    <ol>
+        <li><strong>User interacts</strong> with the frontend (clicks a button, fills a form)</li>
+        <li><strong>jQuery AJAX</strong> sends a POST request to <code>functions.php</code> with a <code>RESULT_TYPE</code> parameter</li>
+        <li><strong><code>functions.php</code></strong> uses a <code>switch-case</code> to route the request to the correct PHP function</li>
+        <li>The PHP function <strong>executes a prepared SQL statement</strong> against the MySQL database</li>
+        <li>Results are <strong>returned as JSON</strong> to the frontend</li>
+        <li><strong>jQuery processes</strong> the JSON response and updates the UI (tables, notifications, etc.)</li>
+    </ol>
+
+    <!-- ═══════════════════════ 7. APPLICATION FLOW ═══════════════════════ -->
+    <h2>7. Application Flow Diagrams</h2>
+
+    <h3>7.1 Authentication Flow</h3>
+    <div class="mermaid-container no-break">
+        <div class="diagram-title">Login Authentication Flow</div>
+        <div class="mermaid">
+flowchart TD
+    A["👤 User Opens Any Page"] --> B{"Authenticated?<br>(Session Check)"}
+    B -->|"No"| C["🔐 Login Page<br>adminlogin.php"]
+    C --> D["Enter Mobile + Password"]
+    D --> E["AJAX POST to<br>functions.php"]
+    E --> F["MD5 Hash Password"]
+    F --> G{"Verify in<br>admin table"}
+    G -->|"❌ Invalid"| H["🔴 Error Toast<br>'Invalid credentials'"]
+    H --> C
+    G -->|"✅ Valid"| I["Set Session Variables<br>USERNAME, ROLE, LOGIN"]
+    I --> J["🏠 Redirect to Dashboard"]
+    B -->|"Yes"| J
+
+    style C fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style J fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style H fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style I fill:#d1fae5,stroke:#059669,stroke-width:2px
+        </div>
+    </div>
+
+    <h3>7.2 Stock Management Flow</h3>
+    <div class="mermaid-container no-break">
+        <div class="diagram-title">Add Stock &amp; Payment Tracking Flow</div>
+        <div class="mermaid">
+flowchart TD
+    A["📦 Add Stock Page"] --> B["Fill Form:<br>Product, Qty, Price,<br>Agency, Payment Mode"]
+    B --> C["AJAX POST<br>RESULT_TYPE: INSERT_STOCK"]
+    C --> D["Calculate:<br>totalbottles = bottles × qty"]
+    D --> E{"Payment Mode?"}
+    E -->|"Cash / PhonePe"| F["status = Paid<br>paid_amount = total"]
+    E -->|"Partial"| G["status = Partial<br>paid_amount = partial"]
+    E -->|"Unpaid"| H["status = Unpaid<br>paid_amount = 0"]
+    F --> I["INSERT INTO stock"]
+    G --> I
+    H --> I
+    I --> J["INSERT INTO<br>totalstocksadded<br>(audit log)"]
+    J --> K["✅ Success Notification<br>DataTable Refreshes"]
+
+    style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style K fill:#d1fae5,stroke:#059669,stroke-width:2px
+    style F fill:#d1fae5,stroke:#059669
+    style G fill:#fef9c3,stroke:#ca8a04
+    style H fill:#fee2e2,stroke:#dc2626
+        </div>
+    </div>
+
+    <h3>7.3 Payment Update Flow</h3>
+    <div class="mermaid-container no-break">
+        <div class="diagram-title">Payment Update on Unpaid/Partial Stock</div>
+        <div class="mermaid">
+flowchart TD
+    A["📋 View Stock Page"] --> B["Click 'Pay' on<br>Unpaid/Partial Row"]
+    B --> C["💳 Payment Modal Opens<br>Shows Remaining Amount"]
+    C --> D["Enter Amount &<br>Select Method"]
+    D --> E["AJAX POST<br>UPDATE_STOCK_PAYMENT"]
+    E --> F["Fetch Current<br>paid_amount from DB"]
+    F --> G["new_paid = current + amount"]
+    G --> H{"new_paid == total?"}
+    H -->|"Yes"| I["status = Paid ✅"]
+    H -->|"No, > 0"| J["status = Partial 🟡"]
+    H -->|"No, == 0"| K["status = Unpaid 🔴"]
+    I --> L["UPDATE stock table"]
+    J --> L
+    K --> L
+    L --> M["✅ Payment Updated<br>Table Refreshes"]
+
+    style C fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style I fill:#d1fae5,stroke:#059669
+    style J fill:#fef9c3,stroke:#ca8a04
+    style K fill:#fee2e2,stroke:#dc2626
+    style M fill:#d1fae5,stroke:#059669,stroke-width:2px
+        </div>
+    </div>
+
+    <h3>7.4 Complete Page Navigation Map</h3>
+    <div class="mermaid-container">
+        <div class="diagram-title">Application Navigation Structure</div>
+        <div class="mermaid">
+flowchart TD
+    LOGIN["🔐 Admin Login<br>adminlogin.php"] -->|"Success"| DASH
+
+    DASH["🏠 Dashboard<br>index.php"]
+
+    DASH --> VS["📦 View Stock<br>viewstocks.php"]
+    DASH --> AS["➕ Add Stock<br>addStock.php"]
+    DASH --> SR["🧾 Sell Receipt<br>sellReceipt.php"]
+    DASH --> PM["💰 Payment Mgmt<br>sellDashboard.php"]
+    DASH --> OO["🛒 Online Orders<br>order_management.php"]
+    DASH --> EX["💸 Expenses<br>expense.php"]
+    DASH --> SAL["👥 Salary<br>salary.php"]
+    DASH --> AU["📊 Audit<br>audit.php"]
+    DASH --> ML["📝 Manage Lists<br>updateList.php"]
+    DASH --> AC["👤 Accounts<br>account.php"]
+    DASH --> LO["🚪 Logout"]
+
+    LO --> LOM["Logout Modal<br>logout_modal.php"]
+    LOM -->|"Confirm"| LD["Session Destroy<br>logout.php"]
+    LD --> LOGIN
+
+    style LOGIN fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style DASH fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style VS fill:#d1fae5,stroke:#059669
+    style AS fill:#d1fae5,stroke:#059669
+    style SR fill:#fef9c3,stroke:#ca8a04
+    style PM fill:#fef9c3,stroke:#ca8a04
+    style OO fill:#fef9c3,stroke:#ca8a04
+    style EX fill:#fef9c3,stroke:#ca8a04
+    style SAL fill:#fef9c3,stroke:#ca8a04
+    style AU fill:#fef9c3,stroke:#ca8a04
+    style ML fill:#fef9c3,stroke:#ca8a04
+    style AC fill:#fef9c3,stroke:#ca8a04
+    style LD fill:#fee2e2,stroke:#dc2626
+        </div>
+    </div>
+
+    <h3>7.5 AJAX Request-Response Lifecycle</h3>
+    <div class="mermaid-container no-break">
+        <div class="diagram-title">AJAX Request-Response Lifecycle (Add Stock Example)</div>
+        <div class="mermaid">
+sequenceDiagram
+    participant U as 👤 User/Browser
+    participant P as 📄 addStock.php
+    participant F as ⚙️ functions.php
+    participant DB as 🗄️ MySQL
+
+    U->>P: Opens page in browser
+    P->>P: Check $_SESSION (auth guard)
+    alt Not Authenticated
+        P-->>U: Redirect to adminlogin.php
+    end
+    P-->>U: Render HTML + JS (Tailwind UI)
+
+    Note over U: User fills form and clicks "Add Stock"
+
+    U->>F: AJAX POST {RESULT_TYPE: "INSERT_STOCK", data...}
+    F->>F: switch(RESULT_TYPE) → insertStock()
+    F->>DB: Prepared Statement: INSERT INTO stock
+    DB-->>F: Success
+    F->>DB: Prepared Statement: INSERT INTO totalstocksadded
+    DB-->>F: Success
+    F-->>U: JSON {"message": "Data inserted successfully"}
+    U->>U: toastr.success() + Reload DataTable
+        </div>
+    </div>
+
+    <h3>7.6 Business Logic Flow</h3>
+    <div class="mermaid-container">
+        <div class="diagram-title">End-to-End Business Flow: Purchase → Sales → Finance</div>
+        <div class="mermaid">
+flowchart LR
+    subgraph Purchase["📥 PURCHASE FLOW"]
+        direction TB
+        P1["Agency / Distributor"] -->|"Supplies Products"| P2["Add Stock Form"]
+        P2 -->|"Record"| P3["stock table"]
+        P2 -->|"Audit Copy"| P4["totalstocksadded"]
+        P3 --> P5{"Payment?"}
+        P5 -->|"Full"| P6["✅ Paid"]
+        P5 -->|"Partial"| P7["🟡 Partial"]
+        P5 -->|"None"| P8["🔴 Unpaid"]
+    end
+
+    subgraph Sales["📤 SALES FLOW"]
+        direction TB
+        S1["Customer at Counter"] -->|"Select Products"| S2["Sell Receipt"]
+        S2 -->|"Create"| S3["bills table"]
+        S3 -->|"Items"| S4["bill_items"]
+        S2 -->|"Record"| S5["sell table"]
+        S3 -->|"Payment"| S6["payments table"]
+    end
+
+    subgraph Finance["📊 FINANCIAL TRACKING"]
+        direction TB
+        F1["Expenses"] --> F4["expenses table"]
+        F2["Salaries"] --> F5["Salary Records"]
+        F3["Audit Dashboard"] --> F6["Charts + Reports"]
+        F4 --> F6
+        F5 --> F6
+    end
+
+    Purchase --> Sales
+    Sales --> Finance
+
+    style Purchase fill:#ecfdf5,stroke:#059669,stroke-width:2px
+    style Sales fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style Finance fill:#fef9c3,stroke:#ca8a04,stroke-width:2px
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ 8. MODULE-WISE EXPLANATION ═══════════════════════ -->
+    <h2>8. Module-Wise Explanation</h2>
+
+    <h3>8.1 Login Module (<code>adminlogin.php</code>)</h3>
+    <ul>
+        <li>Beautiful split-screen login page with branding</li>
+        <li>Authentication via <strong>mobile number + password</strong></li>
+        <li>Password hashed with MD5 before database comparison</li>
+        <li>Supports <strong>Enter key</strong> to submit and <strong>password visibility toggle</strong></li>
+        <li>Role-based access control (admin, manager, staff)</li>
+    </ul>
+
+    <h3>8.2 Dashboard (<code>index.php</code>)</h3>
+    <ul>
+        <li>Shows <strong>total stock overview</strong> (grouped by product name, with box counts)</li>
+        <li>Fetches data via AJAX from <code>GET_TOTAL_STOCK_DASHBOARD</code></li>
+        <li>Displays development <strong>progress bar</strong> (30% complete)</li>
+        <li>Includes <strong>dark mode toggle</strong> with <code>localStorage</code> persistence</li>
+        <li>Placeholder cards for Today's Sales and Today's Earnings (coming soon)</li>
+    </ul>
+
+    <h3>8.3 Add Stock Module (<code>addStock.php</code>) — <span class="badge-complete">Fully Functional</span></h3>
+    <ul>
+        <li>Form with dropdowns for <strong>Product Name</strong> and <strong>Agency Name</strong> (loaded from DB)</li>
+        <li>Input fields: Quantity (boxes), Bottles per Box, Price per Box</li>
+        <li><strong>Auto-calculates</strong> Total Bill Amount (Quantity × Price per Box)</li>
+        <li>Payment modes: Cash, PhonePe, Partial-Cash, Partial-PhonePe, Unpaid</li>
+        <li>Partial payment reveals an additional input field for the partial amount</li>
+        <li>Data inserted into both <code>stock</code> and <code>totalstocksadded</code> tables</li>
+        <li>Below the form: <strong>DataTable</strong> showing all previously added stock records</li>
+    </ul>
+
+    <h3>8.4 View Stock Module (<code>viewstocks.php</code>) — <span class="badge-complete">Fully Functional</span></h3>
+    <ul>
+        <li>Displays all stock data in a searchable, sortable <strong>DataTable</strong></li>
+        <li>Columns: ID, Product, Quantity, Total Bill, Paid Amount, Payment Status, Agency, Actions, Buy Date</li>
+        <li><strong>Pay button</strong> opens a modal for making payments on Unpaid/Partial records</li>
+        <li><strong>View button</strong> shows detailed payment information in a modal</li>
+        <li>Supports <strong>incremental payments</strong> (multiple partial payments tracked)</li>
+        <li>Payment methods can be combined (e.g., Cash + PhonePe)</li>
+    </ul>
+
+    <h3>8.5 Sell Receipt Module (<code>sellReceipt.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Multi-item billing interface for selling products from counters</li>
+        <li>Select product, quantity, scheme (promotional offer), and price</li>
+        <li>Scheme field allows tracking bonus bottles given with purchase</li>
+        <li>Bill summary with counter selection and payment method</li>
+        <li>Sales history table showing recent transactions</li>
+    </ul>
+
+    <h3>8.6 Payment Management (<code>sellDashboard.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Overview of all bills with payment status badges (Paid/Partial/Unpaid)</li>
+        <li>Payment history summary cards: Total Bills, Total Amount, Pending Amount</li>
+        <li>Action buttons to view individual bill details</li>
+    </ul>
+
+    <h3>8.7 Order Management (<code>order_management.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Order cards with color-coded status borders:
+            <ul>
+                <li>Yellow = Pending, Blue = Processing, Purple = Shipped, Green = Delivered</li>
+            </ul>
+        </li>
+        <li>Stats cards showing counts per status category</li>
+        <li>Order details with customer info, products, phone number, and amount</li>
+    </ul>
+
+    <h3>8.8 Expense Management (<code>expense.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Form to add expenses with Date, Type, Amount, and Description</li>
+        <li>Filter buttons: Today, This Week, This Month, All Expenses</li>
+        <li>DataTable of expense records with delete actions</li>
+        <li>Expense types: Supplies, Utilities, Rent, Transport, etc.</li>
+    </ul>
+
+    <h3>8.9 Salary Management (<code>salary.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Stats cards: Total Employees, Active, Monthly Payroll, Paid This Month</li>
+        <li>Employee table with Name, Role, Monthly Salary, Status, Last Paid</li>
+        <li>Salary payment history table</li>
+        <li>Add Employee and Pay/Edit action buttons</li>
+    </ul>
+
+    <h3>8.10 Audit Dashboard (<code>audit.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Financial overview cards: Total Sales, Net Profit, Total Expenses, Cash Flow</li>
+        <li><strong>Bar Chart</strong> (Chart.js): Sales vs Expenses comparison by month</li>
+        <li><strong>Doughnut Chart</strong> (Chart.js): Category-wise expense breakdown</li>
+        <li>Recent transactions table with type badges (Sale, Purchase, Expense, Salary)</li>
+        <li>Period filter: This Month, Last Month, This Quarter, This Year</li>
+    </ul>
+
+    <h3>8.11 Manage Lists (<code>updateList.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Add/manage master data entries:
+            <ul>
+                <li><strong>Products</strong> (e.g., ThumsUp-250, Sprite-250)</li>
+                <li><strong>Agencies</strong> (e.g., Coca-Cola Distributors, PepsiCo Agency)</li>
+                <li><strong>Counters</strong> (e.g., Counter 1, Counter 2)</li>
+            </ul>
+        </li>
+        <li>Three-column layout with input fields and DataTables</li>
+    </ul>
+
+    <h3>8.12 Account Management (<code>account.php</code>) — <span class="badge-demo">UI Demo</span></h3>
+    <ul>
+        <li>Manage admin, manager, and staff accounts</li>
+        <li>Table showing: ID, Username, Mobile, Role, Actions</li>
+        <li>Modal form to add new accounts with role selection</li>
+        <li>Edit and Delete actions for existing accounts</li>
+    </ul>
+
+    <h3>8.13 Sidebar (<code>layouts/sidebar.php</code>)</h3>
+    <ul>
+        <li>Shared navigation component included in all admin pages</li>
+        <li>Shows logged-in user info (username, role) with logo</li>
+        <li>Menu organized into sections: Main Menu, Sales &amp; Billing, Reports &amp; Settings</li>
+        <li><strong>Active page highlighting</strong> using JavaScript URL detection</li>
+        <li>Mobile-responsive with toggle button (Alpine.js)</li>
+        <li>Logout button at the bottom</li>
+    </ul>
+
+    <!-- ═══════════════════════ 9. AUTHENTICATION ═══════════════════════ -->
+    <h2>9. Authentication &amp; Security</h2>
+    <table>
+        <thead>
+            <tr><th>Feature</th><th>Implementation</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Login</strong></td><td>Mobile number + MD5 hashed password verified against <code>admin</code> table</td></tr>
+            <tr><td><strong>Session Management</strong></td><td>PHP <code>$_SESSION</code> stores <code>LOGIN</code>, <code>USERID</code>, <code>USERNAME</code>, <code>ROLE</code></td></tr>
+            <tr><td><strong>Page Protection</strong></td><td>Every page checks session at the top; redirects to login if not authenticated</td></tr>
+            <tr><td><strong>Role-Based Access</strong></td><td><code>admin</code> and <code>manager</code> can access Dashboard &amp; Add Stock; <code>admin</code> only for View Stock, Settings</td></tr>
+            <tr><td><strong>Password Storage</strong></td><td>MD5 hash (Note: MD5 is used for demo; <code>bcrypt</code>/<code>password_hash()</code> recommended for production)</td></tr>
+            <tr><td><strong>SQL Injection Prevention</strong></td><td>Prepared statements with <code>bind_param()</code> used for all database queries</td></tr>
+            <tr><td><strong>AJAX Security</strong></td><td>All AJAX calls use POST method; no sensitive data in URLs</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════ 10. FRONTEND LIBS ═══════════════════════ -->
+    <h2>10. Frontend Libraries Used</h2>
+    <table>
+        <thead>
+            <tr><th>Library</th><th>Version</th><th>CDN Source</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Tailwind CSS</td><td>v4</td><td>Compiled locally (<code>output.css</code>)</td><td>Responsive UI styling</td></tr>
+            <tr><td>jQuery</td><td>3.7.1</td><td><code>code.jquery.com</code></td><td>DOM manipulation &amp; AJAX</td></tr>
+            <tr><td>DataTables</td><td>2.3.0</td><td><code>cdn.datatables.net</code></td><td>Advanced data tables</td></tr>
+            <tr><td>Alpine.js</td><td>3.x</td><td><code>cdn.jsdelivr.net</code></td><td>Reactive UI components</td></tr>
+            <tr><td>Toastr</td><td>Latest</td><td><code>cdnjs.cloudflare.com</code></td><td>Toast notifications</td></tr>
+            <tr><td>SweetAlert2</td><td>11</td><td><code>cdn.jsdelivr.net</code></td><td>Dialog popups</td></tr>
+            <tr><td>Lucide Icons</td><td>Latest</td><td><code>unpkg.com</code></td><td>SVG icon library</td></tr>
+            <tr><td>AOS</td><td>2.3.4</td><td><code>unpkg.com</code></td><td>Scroll animations</td></tr>
+            <tr><td>Chart.js</td><td>Latest</td><td><code>cdn.jsdelivr.net</code></td><td>Data charts</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════ 11. HOW TO RUN ═══════════════════════ -->
+    <h2>11. How to Run the Project</h2>
+
+    <h3>Prerequisites</h3>
+    <ul>
+        <li><strong>XAMPP</strong> installed with Apache and MySQL running</li>
+        <li>A web browser (Chrome, Firefox, Edge)</li>
+    </ul>
+
+    <h3>Setup Steps</h3>
+    <ol>
+        <li><strong>Copy the project folder</strong> to <code>C:\xampp\htdocs\Coldrinks\demo\</code></li>
+        <li><strong>Start XAMPP</strong> — Enable Apache and MySQL services</li>
+        <li><strong>Import the database:</strong>
+            <ul>
+                <li>Open <code>http://localhost/phpmyadmin</code></li>
+                <li>Create a new database named <code>coldrinks_demo</code> (or let the SQL file create it)</li>
+                <li>Import the file <code>coldrinks_demo.sql</code></li>
+            </ul>
+        </li>
+        <li><strong>Access the application:</strong>
+            <ul>
+                <li>Open <code>http://localhost/Coldrinks/demo/admin/adminlogin.php</code></li>
+            </ul>
+        </li>
+        <li><strong>Login credentials:</strong>
+            <ul>
+                <li>Mobile: <code>1234567890</code></li>
+                <li>Password: <code>123</code></li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3>Database Connection Configuration</h3>
+    <p>File: <code>dbconnection.php</code></p>
+    <pre><code>$servername = "localhost";
+$username   = "root";
+$password   = "";
+$dbname     = "coldrinks_demo";</code></pre>
+
+    <!-- ═══════════════════════ 12. PROGRESS ═══════════════════════ -->
+    <h2>12. Development Progress</h2>
+
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 30%;">30% Backend Complete</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Module</th><th>Status</th><th>Backend</th><th>Frontend</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Admin Login &amp; Authentication</td><td><span class="badge-complete">✅ Complete</span></td><td>✅</td><td>✅</td></tr>
+            <tr><td>Dashboard with Stock Overview</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Add Stock Module</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>View Stock &amp; Payment Tracking</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Sell Receipt / Billing</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Payment Management</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Online Order Management</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Expense Management</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Salary Management</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Audit Dashboard</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Manage Lists (Products/Agencies/Counters)</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Account Management</td><td><span class="badge-demo">🟡 UI Only</span></td><td>❌</td><td>✅</td></tr>
+            <tr><td>Logout System</td><td><span class="badge-complete">✅ Complete</span></td><td>✅</td><td>✅</td></tr>
+        </tbody>
+    </table>
+
+  
+
+    <!-- FOOTER -->
+    <div class="doc-footer">
+        <p><strong> ColdDrinks — Web-Based Business Management System</strong></p>
+        <p>Technology: PHP, MySQL, Tailwind CSS, jQuery, XAMPP</p>
+       
+    </div>
+
+</div>
+
+<!-- Mermaid Initialization -->
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        themeVariables: {
+            primaryColor: '#dbeafe',
+            primaryTextColor: '#1e293b',
+            primaryBorderColor: '#2563eb',
+            lineColor: '#64748b',
+            secondaryColor: '#f5f3ff',
+            tertiaryColor: '#ecfdf5',
+            fontSize: '14px'
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis'
+        },
+        sequence: {
+            useMaxWidth: true,
+            actorMargin: 50,
+            messageMargin: 40
+        },
+        er: {
+            useMaxWidth: true,
+            fontSize: 12
+        }
+    });
+</script>
+
+</body>
+</html>

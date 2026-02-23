@@ -1,0 +1,106 @@
+================================================================================
+INFINITYFREE DEPLOYMENT - FILE UPLOAD INSTRUCTIONS
+================================================================================
+
+STEP 1: UPDATE CONFIGURATION FILES
+-----------------------------------
+Before uploading, you MUST update these 2 files with your InfinityFree credentials:
+
+1. config/database.php
+   - Replace sql###.infinityfree.com with YOUR DB host
+   - Replace epizy_XXXXXXX with YOUR username
+   - Replace YOUR_DATABASE_PASSWORD with YOUR password
+   - Replace epizy_XXXXXXX_yashcoldrinks with YOUR database name
+
+2. dbconnection.php (in root folder)
+   - Same replacements as above
+
+Templates are provided:
+- config/database.INFINITYFREE.php (copy and rename to database.php)
+- dbconnection.INFINITYFREE.php (copy and rename to dbconnection.php)
+
+
+STEP 2: UPDATE BASE_URL (Optional - for root domain)
+-----------------------------------------------------
+If hosting on root domain (not subdirectory):
+
+Edit these files and change BASE_URL to empty '':
+
+1. admin/includes/config.php
+   Line 17: define('BASE_URL', '');
+
+2. customer/includes/config.php
+   Line 17: define('BASE_URL', '');
+
+
+STEP 3: UPLOAD FILES VIA FTP
+-----------------------------
+Use FileZilla or InfinityFree File Manager
+
+FTP Details:
+- Host: ftpupload.net
+- Username: epizy_XXXXXXX (from InfinityFree panel)
+- Password: [your FTP password]
+- Port: 21
+
+Upload TO: /htdocs/ folder
+
+
+UPLOAD THESE FOLDERS:
+✅ admin/          (entire folder)
+✅ assets/         (entire folder)
+✅ config/         (entire folder - with UPDATED database.php)
+✅ customer/       (entire folder)
+✅ redirects/      (entire folder)
+✅ src/            (entire folder)
+
+UPLOAD THESE FILES IN ROOT:
+✅ .htaccess
+✅ all-products.php
+✅ cart.php
+✅ cart_action.php
+✅ dbconnection.php (UPDATED with InfinityFree credentials)
+✅ footer.php
+✅ functions.php
+✅ header.php
+✅ index.php
+✅ order_success.php
+✅ product.php
+
+
+DO NOT UPLOAD:
+❌ node_modules/
+❌ Backups/
+❌ .git/
+❌ .vscode/
+❌ dist/
+❌ Notes/
+❌ check_connection.php
+❌ debug_config.php
+❌ *.INFINITYFREE.php (these are templates only)
+❌ *.md files (documentation)
+❌ package.json, package-lock.json
+
+
+STEP 4: TEST YOUR WEBSITE
+--------------------------
+After upload, visit:
+- Homepage: http://yourname.infinityfreeapp.com
+- Admin: http://yourname.infinityfreeapp.com/admin/
+
+Default Admin Login:
+- Username: Yash
+- Password: 123
+
+⚠️ IMPORTANT: Change admin password immediately after first login!
+
+
+TROUBLESHOOTING:
+----------------
+If site shows errors:
+1. Check database credentials are correct
+2. Verify database imported successfully
+3. Check .htaccess uploaded
+4. Check all files uploaded to /htdocs/ not /htdocs/YashColdrinks/
+
+================================================================================

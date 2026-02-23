@@ -1,3 +1,10 @@
+<?php
+session_start();
+$logoutUsername = $_SESSION['USERNAME'] ?? 'User';
+$logoutRole = $_SESSION['ROLE'] ?? 'unknown';
+$roleDisplay = ucfirst($logoutRole);
+if ($logoutRole === 'admin') $roleDisplay = 'Administrator';
+?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -175,13 +182,13 @@
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
                         </svg>
-                        <span class="ml-2">Logged in as: <span class="font-semibold">Yash Walivakar</span></span>
+                        <span class="ml-2">Logged in as: <span class="font-semibold"><?= htmlspecialchars($logoutUsername) ?></span></span>
                     </div>
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
-                        <span class="ml-2">Role: <span class="font-semibold">Administrator</span></span>
+                        <span class="ml-2">Role: <span class="font-semibold"><?= htmlspecialchars($roleDisplay) ?></span></span>
                     </div>
                 </div>
             </div>
